@@ -5,7 +5,9 @@
 #include <stdio.h>
 
 int i = 0;
-pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER; 
+//Uses mutex instead of semaphore as mutex is more secure for this use case as it inludes ownership concept, only the thread that locked the mutex can unlock it.
+//Semaphores are are more signaling for controlling access to a resource to make sure a certain number of threads can access it at the same time.
 
 // Note the return type: void*
 void* incrementingThreadFunction(){
