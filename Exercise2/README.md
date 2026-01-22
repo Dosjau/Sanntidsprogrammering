@@ -91,26 +91,36 @@ Before proceeding with any project-related networking code, think about how you 
 
  - Guarantees about elevators:
    - What should happen if one of the nodes loses its network connection?
+Den burde fullføre jobben før den stopper, så kan den forsøke å koble seg tilbake på nettet. 
    - What should happen if one of the nodes loses power for a brief moment?
+Noden kobler seg på igjen, og får jobben tilbake på nytt slik at den kan fullføre. 
    - What should happen if some unforeseen event causes the elevator to never reach its destination, but communication remains intact?
+Prøv å komme seg tilbake til der den startet. Hvis det ikke går, alarm, da er det noe feil med heisen.
    
  - Guarantees about orders:
-   - Do all your nodes need to "agree" on a call for it to be accepted? In that case, how is a faulty node handled? 
+   - Do all your nodes need to "agree" on a call for it to be accepted? In that case, how is a faulty node handled?
+Alle noder må være enig for at den skal godkjennes ja, for alle heiser må bli enig om hvilken heis som skal gjennomføre oppdraget. Hvis en node er faulty med at den ikke er koblet på nettverket, så må man bare ha en oversikt over hvem som er koblet på slik at kun de aktive trenger å være enig. Hvis en node er faulty med at den ikke mottar meldinger selv om den er på nettverket så må det gås en alarm når den har vært uenig med resten så og så mange ganger.
    - How can you be sure that a remote node "agrees" on an call?
+Alle nodene sender en acknowledment tilbake til den "lokale" noden til knappen slik at den får med seg at alt er mottatt.
    - How do you handle losing packets between the nodes?
+Sender flere ganger, frem til man har fått en acknowlodment.
    - Do you share the entire state of the current calls, or just the changes as they occur?
+Må dele hele ordreloggen, hvis en heis har vært offline vil dens ordrelogg være utdatert når den kommer tilbake.
      - For either one: What should happen when an elevator re-joins after having been offline?
-
+Fortsetter der den var, ikke restarter til første etasje eller liknende.
 *Pencil and paper is encouraged! Drawing a diagram/graph of the message pathways between nodes (elevators) will aid in visualizing complexity. Drawing the order of messages through time will let you more easily see what happens when communication fails.*
      
  - Topology:
    - What kind of network topology do you want to implement? Peer to peer? Master slave? Circle? Something else?
+Vi kjører Peer to Peer. Det er en god løsning for dette systemet da man slipper at hele systemet feiler hvis masteren faller ut.
    - In the case of a master-slave configuration: Do you have only one program, or two (a "master" executable and a "slave")?
      - How do you handle a master node disconnecting?
      - Is a slave becoming a master a part of the network module?
    - In the case of a peer-to-peer configuration:
      - Who decides the order assignment?
+ Den lokale heisen til knappen bestemmer order assignment når den mottar ack fra de to andre heisene.
      - What happens if someone presses the same button on two panels at once? Is this even a problem?
+Man kan gjøre at like ordrer i ordrekøen sletter 1.
    - Remember that you only have three machines available, no outside always-online fourth machine is permitted.
      
  - Technical implementation and module boundary:
@@ -118,6 +128,7 @@ Before proceeding with any project-related networking code, think about how you 
       - If you are using TCP: How do you know who connects to who?
         - Do you need an initialization phase to set up all the connections?
       - If you are using UDP broadcast: How do you differentiate between messages from different nodes?
+   Sett opp en ID for hver heis som sendes med meldingen
       - If you are using a library or language feature to do the heavy lifting - what is it, and does it satisfy your needs?
    - Do you want to build the necessary reliability into the module, or handle that at a higher level?
    - Is detection (and handling) of things like lost messages or lost nodes a part of the network module?
