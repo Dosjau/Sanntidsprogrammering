@@ -91,7 +91,9 @@ Before proceeding with any project-related networking code, think about how you 
 
  - Guarantees about elevators:
    - What should happen if one of the nodes loses its network connection?
+Den burde fullføre jobben før den stopper, så kan den forsøke å koble seg tilbake på nettet.
    - What should happen if one of the nodes loses power for a brief moment?
+ Re-sette seg til 1. Etasje, før den forsøker 
    - What should happen if some unforeseen event causes the elevator to never reach its destination, but communication remains intact?
    
  - Guarantees about orders:
