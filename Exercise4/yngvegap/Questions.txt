@@ -1,0 +1,41 @@
+Hvorfor detektere suksess i stedet for feil?
+
+- Antall mulige feiltilstander er i praksis uendelig.
+- Det er umulig å forutsi og eksplisitt teste for alle feil.
+- Korrekte resultater har derimot klare og endelige kriterier.
+- Hvis vi ikke kan verifisere at resultatet er korrekt, antar vi at noe er galt.
+
+Dette kalles acceptance testing:
+Vi verifiserer at systemet oppfører seg riktig, i stedet for å prøve å oppdage alle måter det kan feile på.
+
+--------------------------------------------------------------------------------------------------
+
+Hvorfor selv-terminere i stedet for å håndtere feilen i primæren?
+
+- Når en feil oppstår, kan intern tilstand allerede være korrupt.
+- Videre kjøring kan føre til udefinert oppførsel og nye feil.
+- Det er ofte umulig å vite om systemet fortsatt er i en trygg tilstand.
+- En ren restart fra en kjent god tilstand er mer pålitelig enn lokal feilretting.
+
+Prinsippet er:
+Stopp prosessen bevisst, og la en ren backup overta.
+
+--------------------------------------------------------------------------------------------------
+
+Hvorfor bruke process pairs i stedet for et separat supervisor-program?
+
+- Et separat supervisor-program blir et single point of failure.
+- Process pairs gir symmetri: hver prosess kan ta over rollen som primær.
+- Systemet blir selvstendig og enklere å distribuere.
+- Mindre ekstern kompleksitet og færre avhengigheter.
+
+Process pairs gir innebygd feiltoleranse, uten å introdusere en ny kritisk komponent.
+
+--------------------------------------------------------------------------------------------------
+
+Something to think about: Usually, a program crashes for a reason. 
+Restoring the program to the same state as it died in may cause it to crash in exactly the same way, 
+all over again. How would you prevent this from happening?
+
+Hvis en krasj skyldes ugyldig tilstand, vil gjenoppretting av samme tilstand føre til ny krasj. 
+Dette unngås ved rollback, tilstandsvalidering eller starte med færre funksjoner aktive.
