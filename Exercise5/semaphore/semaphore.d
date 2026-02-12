@@ -32,18 +32,62 @@ class Resource(T) {
         }
     }
     
+    // IMPLEMENTED
+
     T allocate(int priority){
+        // Enter critical section
+        mtx.wait();
+
+        // If resource is busy, we must wait
+        if (busy) {
+            // Register ourselves as waiting (atomically)
+            numWaiting[priority]++;
+
+            // Release mutex BEFORE blocking
+            mtx.notify();
+
+            // Block until deallocate hands us the resource
+            sems[priority].wait();
+
+            // Ownership has been transferred to us
+            return value;
+        }
+
+        // Resource was free → take it immediately
+        busy = true;
+        mtx.notify();
         return value;
     }
+
+    // IMPLEMENTED
     
     void deallocate(T v){
+        // Enter critical section
+        mtx.wait();
+
+        // Update resource value
         value = v;
+
+        // Mark resource as free (temporarily)
+        busy = false;
+
+        // Hand resource to highest-priority waiter, if any
+        if (numWaiting[1] > 0) {
+            numWaiting[1]--;
+            busy = true;              // direct handoff
+            sems[1].notify();
+        }
+        else if (numWaiting[0] > 0) {
+            numWaiting[0]--;
+            busy = true;              // direct handoff
+            sems[0].notify();
+        }
+
+        // Leave critical section
+        mtx.notify();
     }
+
 }
-
-
-
-
 
 void main(){
 
