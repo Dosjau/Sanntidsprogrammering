@@ -28,29 +28,32 @@ procedure protectobj is
         value: IntVec.Vector;
         busy: Boolean := False;
     end Resource;
-    protected body Resource is
-    
-        entry allocateLow(val: out IntVec.Vector) when True is
+
+   protected body Resource is
+
+        entry allocateLow(val : out IntVec.Vector)
+        when (not busy) and (allocateHigh'Count = 0) is
         begin
-            --Put_Line("allocateLow");
-            val := value;
+            busy := True;
+            val  := value;
         end allocateLow;
-    
-        entry allocateHigh(val: out IntVec.Vector) when True is
+
+        -- High priority may enter when resource is not busy
+        entry allocateHigh(val : out IntVec.Vector)
+        when (not busy) is
         begin
-            --Put_Line("allocateHigh");
-            val := value;
+            busy := True;
+            val  := value;
         end allocateHigh;
 
-        procedure deallocate(val: IntVec.Vector) is
+        -- Release resource and update value
+        procedure deallocate(val : IntVec.Vector) is
         begin
-            --Put_Line("deallocate");
             value := val;
+            busy  := False;
         end deallocate;
 
     end Resource;
-
-
 
     type ExecutionState is (none, waiting, executing, done);
     type ExecutionStateArrT is array (0..9) of ExecutionState;
